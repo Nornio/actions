@@ -34,7 +34,6 @@ const JiraClient_1 = require("./JiraClient");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c;
     try {
-        // Inputs
         const email = process.env.JIRAEMAIL;
         const apiToken = process.env.JIRATOKEN;
         const host = core.getInput("host");
@@ -53,7 +52,6 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             apiToken: apiToken,
             projectKey: projectkey,
         });
-        //Get the JSON webhook payload for the event that triggered the workflow
         const payload = JSON.stringify(github.context.payload, undefined, 2);
         const test = ((_c = (_b = (_a = github === null || github === void 0 ? void 0 : github.context) === null || _a === void 0 ? void 0 : _a.payload) === null || _b === void 0 ? void 0 : _b.pull_request) === null || _c === void 0 ? void 0 : _c.title) || "";
         console.log(`Checking ${test}`);
@@ -68,7 +66,6 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         }
     }
     catch (error) {
-        // core.setFailed(error as Error);
         console.log(error);
     }
 });

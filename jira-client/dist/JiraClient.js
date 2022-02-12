@@ -56,8 +56,6 @@ class JiraClient {
     makeUrl(endpoint) {
         return `${this.baseUrl}${endpoint}`;
     }
-    /// Create a jira release based on whats inside the release notes
-    /// No release will be created if there is no Jira issue keys in the log
     createOrUpdateJiraRelease(version) {
         return __awaiter(this, void 0, void 0, function* () {
             let issueKeys = this.logParser.parseIssuesKeysFromLog(version.changelog);
@@ -70,7 +68,6 @@ class JiraClient {
             }
         });
     }
-    // Check a line of text for jira issue references
     checkTextForJiras(text) {
         return __awaiter(this, void 0, void 0, function* () {
             const lines = text.split(/\,/);
@@ -89,7 +86,6 @@ class JiraClient {
     }
     getIssue(key) {
         return __awaiter(this, void 0, void 0, function* () {
-            // /issue/{issueIdOrKey}
             const endpoint = `/issue/${key}`;
             const response = yield this.http.get(this.makeUrl(endpoint));
             return response.data;
@@ -105,7 +101,6 @@ class JiraClient {
             }
         }
     }
-    ///  Versions
     getVersions() {
         return __awaiter(this, void 0, void 0, function* () {
             const endpoint = `/project/${this.project}/versions`;
@@ -130,7 +125,6 @@ class JiraClient {
             return candidate[0];
         });
     }
-    /// Get the project
     getProject() {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.cachedProject) {
@@ -146,7 +140,6 @@ class JiraClient {
     createFixVersion(version) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log("Will try to create version " + version.name);
-            // First get the project
             const project = yield this.getProject();
             if (!project) {
                 return null;
@@ -166,7 +159,6 @@ class JiraClient {
             return result.data;
         });
     }
-    /// Add a fix version to several issues
     addFixVersionToIssues(version, issues) {
         return __awaiter(this, void 0, void 0, function* () {
             for (const issue in issues) {
@@ -175,12 +167,10 @@ class JiraClient {
             }
         });
     }
-    /// Add a fix version to an issue
     addFixVersion(version, issueID) {
         return __awaiter(this, void 0, void 0, function* () {
             const endpoint = `/issue/${issueID}`;
             let url = this.makeUrl(endpoint);
-            // Get the versions
             let candidate = yield this.getUnreleasedVersion(version.name);
             if (!candidate) {
                 console.log("No such version, create it ...");
@@ -189,14 +179,10 @@ class JiraClient {
                     return false;
                 }
             }
-            // console.log("Got a version candidate");
-            // console.log(candidate);
             const validVersionID = candidate.id;
             const body = {
                 update: { fixVersions: [{ add: { id: validVersionID } }] },
             };
-            // console.log("Will post");
-            // console.log(JSON.stringify(body));
             try {
                 const response = yield this.http.put(url, JSON.stringify(body));
                 this.validateResponse(response);
