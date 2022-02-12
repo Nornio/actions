@@ -1,0 +1,17 @@
+name: "Check JIRA issue reference"
+description: "Checks if PR has a reference to a valid jira ticket"
+inputs:
+    host: # id of input
+        description: "Your atlassian host  i.e. something.atlassian.net"
+        required: true
+
+    project-key: # id of input
+        description: "check jiras under the project with this key. i.e. TMPD"
+        required: true
+
+outputs:
+    time: # id of output
+        description: "The time we greeted you"
+runs:
+    using: "node16"
+    main: "../jira-client/dist/checkPRAction.js"

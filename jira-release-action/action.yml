@@ -1,0 +1,29 @@
+name: "Manage JIRA release"
+description: "Creates or updates a JIRA version and adds the issues mentioned in the changelog"
+inputs:
+    host: # id of input
+        description: "Your atlassian host  i.e. something.atlassian.net"
+        required: true
+
+    project-key: # id of input
+        description: "Create release under the project with this key. i.e. TMPD"
+        required: true
+
+    release-name: # id of input
+        description: "The JIRA release name. i.e. NextPlayer 1.2.3"
+        required: true
+
+    release-description:
+        description: "The JIRA release description. i.e. NextPlayer 1.2.3"
+        required: true
+
+    release-changelog:
+        description: "The JIRA release changelog"
+        required: true
+
+outputs:
+    time: # id of output
+        description: "The time we greeted you"
+runs:
+    using: "node16"
+    main: "../jira-client/dist/releaseAction.js"
