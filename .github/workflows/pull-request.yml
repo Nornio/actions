@@ -8,6 +8,7 @@ jobs:
     check-pr-rules:
         runs-on: ubuntu-latest
         steps:
+            - uses: actions/checkout@v2
             # JIRA Issue check
             - uses: ./jira/check-pr-action
               id: jiraPr
