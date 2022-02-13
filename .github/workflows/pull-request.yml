@@ -15,6 +15,7 @@ jobs:
               with:
                   host: nornio.atlassian.net
                   project-key: NPD
+                  bypass-prefix: "[NOJIRA]"
               env:
                   JIRAEMAIL: ${{ secrets.JIRA_MAIL }}
                   JIRATOKEN: ${{ secrets.JIRA_TOKEN }}
