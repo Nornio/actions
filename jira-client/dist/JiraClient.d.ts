@@ -3,13 +3,28 @@ interface VersionInput {
     description: string;
     changelog: string[];
 }
+interface IssueStatus {
+    name: string;
+}
 interface IssueFields {
     summary: string;
+    reporter: IssueReporter;
+    status: IssueStatus;
+}
+interface IssueReporter {
+    emailAddress: string;
+    displayName: string;
 }
 interface Issue {
     id: string;
     key: string;
     fields: IssueFields;
+}
+interface CompactIssue {
+    id: string;
+    key: string;
+    statusName: string;
+    summary: string;
 }
 interface JiraVersion {
     self: string;
@@ -36,6 +51,11 @@ interface JiraClientConfig {
     apiToken: string;
     projectKey: string;
 }
+declare class Formatting {
+    pad(value: number): string;
+    getTodaysDate(): string;
+    formatDate(date: Date): string;
+}
 declare class JiraClient {
     private http;
     private cachedProject?;
@@ -47,7 +67,7 @@ declare class JiraClient {
     get baseUrl(): string;
     makeUrl(endpoint: string): string;
     createOrUpdateJiraRelease(version: VersionInput): Promise<void>;
-    checkTextForJiras(text: string): Promise<string[]>;
+    checkTextForExistingJiras(text: string): Promise<CompactIssue[]>;
     getIssue(key: string): Promise<Issue>;
     private validateResponse;
     getVersions(): Promise<JiraVersion[]>;
@@ -55,7 +75,7 @@ declare class JiraClient {
     getUnreleasedVersion(versionName: string): Promise<JiraVersion | null>;
     getProject(): Promise<JiraProject | null>;
     private createFixVersion;
-    addFixVersionToIssues(version: VersionInput, issues: string[]): Promise<void>;
+    private addFixVersionToIssues;
     private addFixVersion;
 }
-export { JiraClient, VersionInput, JiraClientConfig };
+export { JiraClient, VersionInput, JiraClientConfig, Formatting };

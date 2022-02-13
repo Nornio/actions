@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.JiraClient = void 0;
+exports.Formatting = exports.JiraClient = void 0;
 const axios_1 = require("axios");
 const JiraIssueParser_1 = __importDefault(require("./JiraIssueParser"));
 class NotFoundError extends Error {
@@ -20,6 +20,19 @@ class NotFoundError extends Error {
         super("Not found");
     }
 }
+class Formatting {
+    pad(value) {
+        const string = `${value}`;
+        return string.padStart(2, "0");
+    }
+    getTodaysDate() {
+        return this.formatDate(new Date());
+    }
+    formatDate(date) {
+        return `${date.getFullYear()}-${this.pad(date.getMonth() + 1)}-${this.pad(date.getDate())}`;
+    }
+}
+exports.Formatting = Formatting;
 class JiraClient {
     constructor(config) {
         this.cachedProject = null;
@@ -68,7 +81,7 @@ class JiraClient {
             }
         });
     }
-    checkTextForJiras(text) {
+    checkTextForExistingJiras(text) {
         return __awaiter(this, void 0, void 0, function* () {
             const lines = text.split(/\,/);
             const keys = this.logParser.parseIssuesKeysFromLog(lines);
@@ -77,17 +90,26 @@ class JiraClient {
                 const key = keys[ix];
                 try {
                     const issue = yield this.getIssue(key);
-                    result.push(issue.fields.summary);
+                    result.push(issue);
                 }
                 catch (error) { }
             }
-            return result;
+            return result.map((i) => {
+                var _a, _b, _c;
+                return {
+                    id: i.id,
+                    key: i.key,
+                    statusName: (_b = (_a = i.fields) === null || _a === void 0 ? void 0 : _a.status) === null || _b === void 0 ? void 0 : _b.name,
+                    summary: (_c = i.fields) === null || _c === void 0 ? void 0 : _c.summary,
+                };
+            });
         });
     }
     getIssue(key) {
         return __awaiter(this, void 0, void 0, function* () {
             const endpoint = `/issue/${key}`;
             const response = yield this.http.get(this.makeUrl(endpoint));
+            this.validateResponse(response);
             return response.data;
         });
     }
@@ -139,16 +161,18 @@ class JiraClient {
     }
     createFixVersion(version) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log("Will try to create version " + version.name);
+            console.log("Will create version " + version.name);
             const project = yield this.getProject();
             if (!project) {
                 return null;
             }
             const endpoint = `/version`;
             let url = this.makeUrl(endpoint);
+            const formatter = new Formatting();
+            const releaseDate = formatter.getTodaysDate();
             const body = {
                 archived: false,
-                releaseDate: "2022-02-15",
+                releaseDate: releaseDate,
                 name: version.name,
                 description: version.description,
                 projectId: project.id,

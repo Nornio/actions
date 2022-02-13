@@ -13,8 +13,14 @@ interface VersionInput {
     changelog: string[];
 }
 
+interface IssueStatus {
+    name: string;
+}
+
 interface IssueFields {
     summary: string;
+    reporter: IssueReporter;
+    status: IssueStatus;
 }
 
 interface IssueReporter {
@@ -26,6 +32,13 @@ interface Issue {
     id: string;
     key: string;
     fields: IssueFields;
+}
+
+interface CompactIssue {
+    id: string;
+    key: string;
+    statusName: string;
+    summary: string;
 }
 
 interface JiraVersion {
@@ -54,6 +67,23 @@ interface JiraClientConfig {
     email: string;
     apiToken: string;
     projectKey: string;
+}
+
+class Formatting {
+    pad(value: number) {
+        const string = `${value}`;
+        return string.padStart(2, "0");
+    }
+
+    getTodaysDate(): string {
+        return this.formatDate(new Date());
+    }
+
+    formatDate(date: Date): string {
+        return `${date.getFullYear()}-${this.pad(
+            date.getMonth() + 1
+        )}-${this.pad(date.getDate())}`;
+    }
 }
 
 class JiraClient {
@@ -122,26 +152,39 @@ class JiraClient {
     }
 
     // Check a line of text for jira issue references
-    public async checkTextForJiras(text: string): Promise<string[]> {
+    public async checkTextForExistingJiras(
+        text: string
+    ): Promise<CompactIssue[]> {
         const lines = text.split(/\,/);
 
         const keys = this.logParser.parseIssuesKeysFromLog(lines);
-        let result: string[] = [];
+        let result: Issue[] = [];
 
         for (const ix in keys) {
             const key = keys[ix];
             try {
                 const issue = await this.getIssue(key);
-                result.push(issue.fields.summary);
+                result.push(issue);
             } catch (error) {}
         }
-        return result;
+
+        // Return just the essentials instead of the whole object
+        // console.log(result[0].fields);
+        return result.map((i) => {
+            return {
+                id: i.id,
+                key: i.key,
+                statusName: i.fields?.status?.name,
+                summary: i.fields?.summary,
+            };
+        });
     }
 
     public async getIssue(key: string): Promise<Issue> {
         // /issue/{issueIdOrKey}
         const endpoint = `/issue/${key}`;
         const response = await this.http.get<Issue>(this.makeUrl(endpoint));
+        this.validateResponse(response);
         return response.data;
     }
 
@@ -158,7 +201,7 @@ class JiraClient {
 
     ///  Versions
 
-    async getVersions(): Promise<JiraVersion[]> {
+    public async getVersions(): Promise<JiraVersion[]> {
         const endpoint = `/project/${this.project}/versions`;
         const response = await this.http.get<JiraVersion[]>(
             this.makeUrl(endpoint)
@@ -167,7 +210,7 @@ class JiraClient {
         return response.data;
     }
 
-    async getUnreleasedVersions(): Promise<JiraVersion[]> {
+    public async getUnreleasedVersions(): Promise<JiraVersion[]> {
         const versions = await this.getVersions();
         return versions.filter((v) => v.released == false);
     }
@@ -188,7 +231,7 @@ class JiraClient {
     }
 
     /// Get the project
-    async getProject(): Promise<JiraProject | null> {
+    public async getProject(): Promise<JiraProject | null> {
         if (this.cachedProject) {
             return this.cachedProject;
         }
@@ -205,7 +248,7 @@ class JiraClient {
     private async createFixVersion(
         version: VersionInput
     ): Promise<JiraVersion | null> {
-        console.log("Will try to create version " + version.name);
+        console.log("Will create version " + version.name);
 
         // First get the project
         const project = await this.getProject();
@@ -216,10 +259,12 @@ class JiraClient {
 
         const endpoint = `/version`;
         let url = this.makeUrl(endpoint);
+        const formatter = new Formatting();
+        const releaseDate = formatter.getTodaysDate();
 
         const body = {
             archived: false,
-            releaseDate: "2022-02-15",
+            releaseDate: releaseDate,
             name: version.name,
             description: version.description,
             projectId: project.id,
@@ -235,7 +280,10 @@ class JiraClient {
     }
 
     /// Add a fix version to several issues
-    async addFixVersionToIssues(version: VersionInput, issues: string[]) {
+    private async addFixVersionToIssues(
+        version: VersionInput,
+        issues: string[]
+    ) {
         for (const issue in issues) {
             const issueID = issues[issue];
             await this.addFixVersion(version, issueID);
@@ -287,4 +335,4 @@ class JiraClient {
     }
 }
 
-export { JiraClient, VersionInput, JiraClientConfig };
+export { JiraClient, VersionInput, JiraClientConfig, Formatting };

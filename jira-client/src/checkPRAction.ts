@@ -23,10 +23,9 @@ const main = async () => {
         }
 
         // Inputs
-        const missingJiraBypassTitlePrefix = core.getInput(
-            "missingJiraBypassTitlePrefix",
-            { required: false }
-        );
+        const missingJiraBypassTitlePrefix = core.getInput("bypass-prefix", {
+            required: false,
+        });
         const host = core.getInput("host", { required: true });
         const projectkey = core.getInput("project-key", { required: true });
 
@@ -39,10 +38,9 @@ const main = async () => {
         });
 
         //Get the JSON webhook payload for the event that triggered the workflow
-        const payload = JSON.stringify(github.context.payload, undefined, 2);
         const test: string =
             github?.context?.payload?.pull_request?.title || "";
-        console.log(`Checking ${test}`);
+        console.log(`*** Checking pull request title: ${test}`);
 
         if (
             missingJiraBypassTitlePrefix &&
@@ -54,16 +52,16 @@ const main = async () => {
             return;
         }
 
-        const result = await client.checkTextForJiras(test);
+        const result = await client.checkTextForExistingJiras(test);
 
         if (result.length == 0) {
             if (missingJiraBypassTitlePrefix) {
                 core.setFailed(
-                    `Pull-request title does not mention an existing JIRA issue in the project ${projectkey}. Please correct this by prefixing the title with a JIRA issue key i.e. ${projectkey}-1234. If there are no JIRA for this PR you are allowed to bypass this test by prefixing the title with ${missingJiraBypassTitlePrefix}`
+                    `Pull-request title does not mention an existing JIRA issue in the project ${projectkey}. Please correct this by prefixing the title with a JIRA issue key i.e. ${projectkey}-1234. If there is no JIRA needed for this PR you are allowed to bypass this test by prefixing the title with ${missingJiraBypassTitlePrefix}`
                 );
             } else {
                 core.setFailed(
-                    `Pull-request title does not mention an existing JIRA issue in the project ${projectkey}. Please correct this by prefixing the title with a JIRA issue key i.e. ${projectkey}-1234. You can set the missingJiraBypassTitlePrefix input on this action to a string that allows bypassing of this test if set to a prefix to the title of the pull-request`
+                    `Pull-request title does not mention an existing JIRA issue in the project ${projectkey}. Please correct this by prefixing the title with a JIRA issue key i.e. ${projectkey}-1234. This Jira issue needs to exist on the project ${projectkey}. You can set the bypass-prefix input on this action to a string that allows bypassing of this test if set as a prefix to the title of the pull-request.`
                 );
             }
         } else {

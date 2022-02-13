@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 class JiraIssueParser {
     constructor(projectKey) {
         this.projectKey = projectKey;
-        console.log(`Initializing logparser with project key >${projectKey}<`);
+        console.log(`Initializing JiraIssueParser with project key >${projectKey}<`);
     }
     parseIssuesKeysFromLog(log) {
         let result = [];
@@ -13,7 +13,7 @@ class JiraIssueParser {
                 result = result.concat(matches);
             }
         });
-        return result;
+        return [...new Set(result)];
     }
     parseLineForIssues(line) {
         const regex = new RegExp(`(\\b${this.projectKey}-\\d*\\b)`, "gm");
