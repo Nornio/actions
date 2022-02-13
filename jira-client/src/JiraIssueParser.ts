@@ -1,10 +1,11 @@
 class JiraIssueParser {
     constructor(private projectKey: string) {
-        console.log(`Initializing logparser with project key >${projectKey}<`);
+        console.log(
+            `Initializing JiraIssueParser with project key >${projectKey}<`
+        );
     }
 
     parseIssuesKeysFromLog(log: string[]): string[] {
-        //const lines = log.split(/\r?\n?%0A?%0D/);
         let result: string[] = [];
         log.forEach((line) => {
             let matches = this.parseLineForIssues(line);
@@ -12,12 +13,12 @@ class JiraIssueParser {
                 result = result.concat(matches);
             }
         });
-        return result;
+        return [...new Set(result)];
     }
 
     parseLineForIssues(line: string): string[] | null {
         const regex = new RegExp(`(\\b${this.projectKey}-\\d*\\b)`, "gm");
-        // const r = `/(\bTMPD-\d* \b)/gm`;
+        // const r = `/(\bTMPD-\d*\b)/gm`;
         return line.match(regex);
     }
 }

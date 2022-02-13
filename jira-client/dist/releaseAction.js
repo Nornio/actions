@@ -32,7 +32,6 @@ const core = __importStar(require("@actions/core"));
 const JiraClient_1 = require("./JiraClient");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // Inputs
         const email = process.env.JIRAEMAIL;
         const apiToken = process.env.JIRATOKEN;
         const host = core.getInput("host");
@@ -46,11 +45,11 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             description: releaseDesciption,
         };
         if (!email) {
-            console.log("Missing JIRAEMAIL env");
+            core.setFailed("Missing JIRAEMAIL env variable. Use env: JIRAEMAIL: ${{ secrets.MY_JIRA_MAIL_SECRET }}");
             return;
         }
         if (!apiToken) {
-            console.log("Missing JIRATOKEN env");
+            core.setFailed("Missing JIRATOKEN env variable. Use env: JIRATOKEN: ${{ secrets.MY_JIRATOKEN_SECRET }}");
             return;
         }
         let client = new JiraClient_1.JiraClient({
@@ -60,13 +59,8 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             projectKey: projectkey,
         });
         yield client.createOrUpdateJiraRelease(versionInput);
-        const time = new Date().toTimeString();
-        core.setOutput("time", time);
-        // Get the JSON webhook payload for the event that triggered the workflow
-        // const payload = JSON.stringify(github.context.payload, undefined, 2);
     }
     catch (error) {
-        // core.setFailed(error as Error);
         console.log(error);
     }
 });

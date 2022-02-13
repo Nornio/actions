@@ -1,0 +1,21 @@
+name: Check PR rules
+
+on:
+    pull_request:
+        types: [opened, reopened, edited, synchronize]
+
+jobs:
+    check-pr-rules:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            # JIRA Issue check
+            - uses: ./jira/check-pr-action
+              id: jiraPr
+              with:
+                  host: nornio.atlassian.net
+                  project-key: NPD
+                  bypass-prefix: "[NOJIRA]"
+              env:
+                  JIRAEMAIL: ${{ secrets.JIRA_MAIL }}
+                  JIRATOKEN: ${{ secrets.JIRA_TOKEN }}
