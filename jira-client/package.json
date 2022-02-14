@@ -3,20 +3,8 @@
     "version": "1.0.0",
     "description": "Jira actions",
     "main": "index.js",
-    "scripts": {
-        "checkpr": "ts-node ./src/checkPRAction.ts",
-        "build": "rimraf ./dist && tsc",
-        "dev": "nodemon"
-    },
     "author": "",
     "license": "ISC",
-    "devDependencies": {
-        "@types/node": "^17.0.17",
-        "nodemon": "^2.0.15",
-        "rimraf": "^3.0.2",
-        "ts-node": "^10.5.0",
-        "typescript": "^4.5.5"
-    },
     "dependencies": {
         "@actions/core": "^1.6.0",
         "@actions/github": "^5.0.0",
