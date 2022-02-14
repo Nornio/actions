@@ -41,6 +41,11 @@ This action lets you find or create a JIRA version (release) and assign fix-vers
 Example usage:
 
 ```yml
+  # Steps to do git tag/release and to create a changelog is not part of this example
+  .
+  .
+  .
+
   # JIRA Release
   - uses: Nornio/actions/jira/release-action@v1.0.0
     id: jiraRelease
