@@ -23,4 +23,4 @@ inputs:
 
 runs:
     using: "node16"
-    main: "../../jira-client/dist/releaseAction.js"
+    main: "../../jira-client/dist/releaseAction.min.js"

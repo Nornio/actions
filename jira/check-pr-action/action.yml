@@ -15,4 +15,4 @@ inputs:
 
 runs:
     using: "node16"
-    main: "../../jira-client/dist/checkPRAction.js"
+    main: "../../jira-client/dist/checkPRAction.min.js"

@@ -1,7 +1,7 @@
 {
     "name": "jira",
     "version": "1.0.0",
-    "description": "Jira client",
+    "description": "Jira actions",
     "main": "index.js",
     "scripts": {
         "checkpr": "ts-node ./src/checkPRAction.ts",
