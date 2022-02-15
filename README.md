@@ -36,7 +36,7 @@ _Requirements: Create a API Token in jira and set the JIRAEMAIL and JIRATOKEN en
 
 This action lets you find or create a JIRA version (release) and assign fix-version to JIRA Issues referenced in the change log.
 
-`Nornio/actions/jira/release-action@v0.0.2`
+`Nornio/actions/jira/release-action@v1.0.0`
 
 Example usage:
 
