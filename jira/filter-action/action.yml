@@ -1,0 +1,13 @@
+name: "FILTER"
+description: "Filter a list"
+inputs:
+    json:
+        description: "The list of strings to filter in a json array object"
+        required: true
+    startsWith:
+        description: "Filter condition"
+        required: true
+
+runs:
+    using: "node16"
+    main: "../../jira-client/dist/filterAction.js"
