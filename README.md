@@ -21,7 +21,6 @@ jobs:
         steps:
             # JIRA Issue check
             - uses: Nornio/actions/jira/check-pr-action@v1.0.0
-              id: checkPullRequest
               with:
                   host: myhost.atlassian.net
                   project-key: MYPROJ
