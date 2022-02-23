@@ -24,7 +24,7 @@ jobs:
               with:
                   host: myhost.atlassian.net
                   project-key: MYPROJ
-                  bypass-prefix: "[NOJIRA]"
+                  bypass-prefix: "(QUICKFIX)"
               env:
                   JIRAEMAIL: ${{ secrets.JIRA_MAIL }}
                   JIRATOKEN: ${{ secrets.JIRA_TOKEN }}
